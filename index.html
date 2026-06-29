@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Grad Tracker - Carga Horária</title>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <div class="app-container">
+        <!-- Sidebar / Menu -->
+        <aside class="sidebar glass-panel">
+            <h1 class="logo">Grad<span>Tracker</span></h1>
+            <nav class="nav-menu">
+                <button class="nav-btn active" data-target="dashboard">Dashboard</button>
+                <button class="nav-btn" data-target="disciplinas">Disciplinas</button>
+                <button class="nav-btn" data-target="clinicas">Clínicas Jurídicas</button>
+                <button class="nav-btn" data-target="complementares">Ativ. Complementares</button>
+                <button class="nav-btn" data-target="extensao">Ativ. Extensão</button>
+            </nav>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <!-- Topbar -->
+            <header class="topbar">
+                <h2 id="page-title">Dashboard</h2>
+            </header>
+
+            <!-- Dashboard View -->
+            <section id="view-dashboard" class="view-section active">
+                <div class="dashboard-grid">
+                    <div class="card glass-panel emphasis-panel">
+                        <h3>Progresso por Ênfase</h3>
+                        <p class="subtitle">Horas Complementares, Extensionistas e nº de Disciplinas concluídas.</p>
+                        <div id="emphasis-list" class="emphasis-list">
+                            <!-- Injected by JS -->
+                        </div>
+                    </div>
+                    <div class="card glass-panel stats-panel">
+                        <h3>Resumo Geral de Horas</h3>
+                        <div id="general-stats" class="stats-list">
+                            <!-- Injected by JS -->
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Disciplinas View -->
+            <section id="view-disciplinas" class="view-section hidden">
+                <div class="header-actions">
+                    <button class="btn btn-primary" id="btn-add-subject-box">+ Nova Caixa de Disciplinas</button>
+                </div>
+                <div id="subject-boxes-container" class="boxes-container">
+                    <!-- Injected by JS -->
+                </div>
+            </section>
+
+            <!-- Clínicas View -->
+            <section id="view-clinicas" class="view-section hidden">
+                <div class="header-actions">
+                    <button class="btn btn-primary" id="btn-add-clinic">+ Nova Clínica Jurídica</button>
+                </div>
+                <div id="clinics-container">
+                    <!-- Injected by JS -->
+                </div>
+            </section>
+
+            <!-- Atividades Complementares View -->
+            <section id="view-complementares" class="view-section hidden">
+                <div class="header-actions">
+                    <button class="btn btn-secondary" id="btn-config-comp-box">Configurar Horas Totais</button>
+                    <button class="btn btn-primary" id="btn-add-comp-activity">+ Nova Atividade</button>
+                </div>
+                <div class="box-info glass-panel" id="comp-box-info">
+                    <!-- Injected by JS -->
+                </div>
+                <div id="comp-activities-container" class="activities-container">
+                    <!-- Injected by JS -->
+                </div>
+            </section>
+
+            <!-- Atividades Extensionistas View -->
+            <section id="view-extensao" class="view-section hidden">
+                <div class="header-actions">
+                    <button class="btn btn-secondary" id="btn-config-ext-box">Configurar Horas Totais</button>
+                    <button class="btn btn-primary" id="btn-add-ext-activity">+ Nova Atividade</button>
+                </div>
+                <div class="box-info glass-panel" id="ext-box-info">
+                    <!-- Injected by JS -->
+                </div>
+                <div id="ext-activities-container" class="activities-container">
+                    <!-- Injected by JS -->
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <!-- Modals Overlay -->
+    <div class="modal-overlay hidden" id="modal-overlay">
+        <!-- Container for dynamic modals -->
+        <div id="modal-container" class="modal-content glass-panel"></div>
+    </div>
+
+    <script src="js/store.js"></script>
+    <script src="js/app.js"></script>
+</body>
+</html>

@@ -1,0 +1,482 @@
+:root {
+    --bg-color: #0f0c29;
+    --bg-gradient: linear-gradient(135deg, #0f0c29, #302b63, #24243e);
+    --glass-bg: rgba(255, 255, 255, 0.05);
+    --glass-border: rgba(255, 255, 255, 0.1);
+    --text-main: #f8f8ff;
+    --text-muted: #a0a0b5;
+    --primary-color: #9d4edd;
+    --primary-hover: #c77dff;
+    --secondary-color: #e0aaff;
+    --success-color: #00f5d4;
+    --danger-color: #ff3366;
+    --radius-lg: 16px;
+    --radius-md: 12px;
+    --radius-sm: 8px;
+    --shadow-glass: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+    --transition: all 0.3s ease;
+}
+
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+    font-family: 'Outfit', sans-serif;
+}
+
+body {
+    background: var(--bg-gradient);
+    background-attachment: fixed;
+    color: var(--text-main);
+    min-height: 100vh;
+    display: flex;
+}
+
+/* Glassmorphism */
+.glass-panel {
+    background: var(--glass-bg);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border: 1px solid var(--glass-border);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-glass);
+}
+
+.app-container {
+    display: flex;
+    width: 100%;
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 20px;
+    gap: 20px;
+}
+
+/* Sidebar */
+.sidebar {
+    width: 250px;
+    padding: 30px 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 40px;
+    flex-shrink: 0; /* Prevents shrinking on smaller screens before breakpoint */
+}
+
+.logo {
+    font-size: 28px;
+    font-weight: 700;
+}
+.logo span {
+    color: var(--primary-color);
+}
+
+.nav-menu {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.nav-btn {
+    background: transparent;
+    border: none;
+    color: var(--text-muted);
+    text-align: left;
+    padding: 12px 16px;
+    border-radius: var(--radius-md);
+    font-size: 16px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: var(--transition);
+}
+
+.nav-btn:hover, .nav-btn.active {
+    background: rgba(157, 78, 221, 0.2);
+    color: var(--text-main);
+}
+
+/* Main Content */
+.main-content {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    overflow-y: auto;
+    padding-bottom: 20px;
+    min-width: 0; /* Important for flex children to not overflow */
+}
+
+.topbar {
+    padding: 10px 0;
+}
+
+.view-section {
+    display: none;
+    flex-direction: column;
+    gap: 20px;
+    animation: fadeIn 0.4s ease forwards;
+}
+
+.view-section.active {
+    display: flex;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+/* Buttons */
+.btn {
+    padding: 12px 20px; /* Slightly larger padding for better touch target */
+    border-radius: var(--radius-sm);
+    border: none;
+    font-size: 15px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: var(--transition);
+    display: inline-flex;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+}
+
+.btn-sm {
+    padding: 8px 12px;
+    font-size: 13px;
+}
+
+.btn-primary {
+    background: var(--primary-color);
+    color: #fff;
+}
+.btn-primary:hover {
+    background: var(--primary-hover);
+    box-shadow: 0 4px 15px rgba(157, 78, 221, 0.4);
+}
+
+.btn-secondary {
+    background: transparent;
+    border: 1px solid var(--primary-color);
+    color: var(--primary-color);
+}
+.btn-secondary:hover {
+    background: rgba(157, 78, 221, 0.1);
+}
+
+.header-actions {
+    display: flex;
+    gap: 15px;
+    flex-wrap: wrap;
+}
+
+/* Dashboard / Panels */
+.dashboard-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+}
+
+.card {
+    padding: 24px;
+}
+
+.card h3 {
+    margin-bottom: 8px;
+    font-size: 20px;
+    color: var(--primary-hover);
+}
+.subtitle {
+    font-size: 14px;
+    color: var(--text-muted);
+    margin-bottom: 20px;
+}
+
+/* Emphasis List */
+.emphasis-item {
+    background: rgba(0,0,0,0.2);
+    padding: 15px;
+    border-radius: var(--radius-sm);
+    margin-bottom: 10px;
+    border-left: 4px solid var(--primary-color);
+}
+.emphasis-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-bottom: 12px;
+}
+.emphasis-header h4 {
+    color: var(--text-main);
+    flex: 1;
+    min-width: 150px;
+}
+.badge {
+    padding: 4px 8px;
+    border-radius: 4px;
+    font-size: 12px;
+    font-weight: bold;
+    white-space: nowrap;
+}
+.badge-concluida {
+    background: rgba(0, 245, 212, 0.2);
+    color: var(--success-color);
+}
+.badge-pendente {
+    background: rgba(255, 165, 0, 0.2);
+    color: orange;
+}
+.emphasis-stats {
+    display: flex;
+    gap: 15px;
+    font-size: 14px;
+    color: var(--text-muted);
+    flex-wrap: wrap;
+}
+.emphasis-stats span {
+    background: rgba(255,255,255,0.05);
+    padding: 4px 8px;
+    border-radius: 4px;
+}
+
+/* Boxes & Progress */
+.box-info, .box-item, .activity-item, .subject-item {
+    padding: 20px;
+    margin-bottom: 15px;
+}
+
+.box-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 15px;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+
+.progress-bar-container {
+    height: 8px;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 4px;
+    overflow: hidden;
+    margin-top: 10px;
+    width: 100%;
+}
+.progress-bar {
+    height: 100%;
+    background: linear-gradient(90deg, var(--primary-hover), var(--success-color));
+    width: 0%;
+    transition: width 0.5s ease;
+}
+
+.box-actions {
+    margin-top: 15px;
+}
+
+.subject-item, .activity-item {
+    background: rgba(0,0,0,0.2);
+    border-radius: var(--radius-sm);
+    margin-top: 10px;
+    padding: 15px;
+    border-left: 4px solid var(--text-muted);
+}
+.subject-item.status-concluida {
+    border-left-color: var(--success-color);
+}
+.subject-item.status-em_curso {
+    border-left-color: var(--primary-hover);
+}
+
+.item-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+.item-header strong {
+    flex: 1;
+    min-width: 150px;
+    word-break: break-word;
+}
+.item-header > div {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+.item-details {
+    font-size: 13px;
+    color: var(--text-muted);
+    margin-top: 10px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+
+/* Modals */
+.modal-overlay {
+    position: fixed;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background: rgba(0, 0, 0, 0.7);
+    backdrop-filter: blur(5px);
+    display: flex;
+    justify-content: center;
+    align-items: center; /* Center on large screens */
+    z-index: 1000;
+    padding: 20px; /* Prevent touching screen edges */
+}
+.modal-overlay.hidden {
+    display: none;
+}
+.modal-content {
+    background: var(--bg-color);
+    width: 100%;
+    max-width: 500px;
+    max-height: 90vh;
+    overflow-y: auto;
+    padding: 30px; /* Ensure padding is applied via CSS instead of HTML for consistency */
+}
+
+.modal-content h3 {
+    margin-bottom: 20px;
+    color: var(--text-main);
+}
+
+.form-group {
+    margin-bottom: 18px; /* Slightly larger margin for touch devices */
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+.form-group.hidden {
+    display: none;
+}
+
+.form-group label {
+    font-size: 14px;
+    color: var(--text-muted);
+}
+
+.form-control {
+    background: rgba(0, 0, 0, 0.3);
+    border: 1px solid var(--glass-border);
+    padding: 12px;
+    border-radius: var(--radius-sm);
+    color: var(--text-main);
+    outline: none;
+    font-size: 15px;
+    min-height: 44px; /* Apple Human Interface Guideline for minimum touch target */
+}
+.form-control:focus {
+    border-color: var(--primary-hover);
+}
+
+.form-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+    margin-top: 25px;
+}
+
+
+/* ==========================================================================
+   RESPONSIVE (Mobile & Tablets)
+   ========================================================================== */
+
+@media (max-width: 992px) {
+    .dashboard-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+@media (max-width: 768px) {
+    .app-container {
+        flex-direction: column;
+        padding: 10px;
+        gap: 10px;
+    }
+
+    .sidebar {
+        width: 100%;
+        padding: 20px 15px;
+        gap: 20px;
+        flex-direction: column;
+        align-items: center; /* Center logo and nav on mobile */
+    }
+
+    .nav-menu {
+        flex-direction: row;
+        width: 100%;
+        overflow-x: auto; /* Allow horizontal scrolling if buttons don't fit */
+        padding-bottom: 5px;
+        scrollbar-width: none; /* Hide scrollbar Firefox */
+        justify-content: flex-start; /* Better for scrolling */
+    }
+    .nav-menu::-webkit-scrollbar {
+        display: none; /* Hide scrollbar Chrome/Safari */
+    }
+
+    .nav-btn {
+        text-align: center;
+        white-space: nowrap; /* Prevent button text from wrapping */
+        padding: 10px 14px;
+        font-size: 14px;
+    }
+
+    .main-content {
+        padding-bottom: 30px;
+    }
+
+    .card, .box-info, .box-item, .activity-item, .subject-item {
+        padding: 15px; /* Slightly less padding on mobile */
+    }
+
+    .header-actions {
+        flex-direction: column;
+        width: 100%;
+    }
+    
+    .header-actions .btn {
+        width: 100%; /* Full width buttons on mobile */
+    }
+    
+    .box-header {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .box-header .btn {
+        width: 100%;
+        margin-top: 10px;
+    }
+
+    .item-header {
+        flex-direction: column;
+        gap: 8px;
+    }
+    .item-header > div {
+        width: 100%;
+        justify-content: space-between;
+    }
+
+    .modal-overlay {
+        align-items: flex-end; /* On mobile, modal comes from bottom */
+        padding: 10px;
+    }
+    
+    .modal-content {
+        border-radius: var(--radius-lg) var(--radius-lg) 0 0; /* Flat bottom */
+        max-height: 85vh; /* Room for mobile keyboard */
+        padding: 20px;
+    }
+    
+    .form-actions {
+        flex-direction: column;
+        gap: 10px;
+    }
+    
+    .form-actions .btn {
+        width: 100%;
+    }
+}
