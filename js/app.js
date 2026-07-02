@@ -1,21 +1,45 @@
 // ---- Navigation ----
-document.querySelectorAll('.nav-btn').forEach(btn => {
-    btn.addEventListener('click', (e) => {
-        document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
-        e.target.classList.add('active');
-        const targetId = 'view-' + e.target.dataset.target;
-        
-        document.querySelectorAll('.view-section').forEach(sec => sec.classList.remove('active'));
-        document.getElementById(targetId).classList.add('active');
-        
-        document.getElementById('page-title').innerText = e.target.innerText;
-        refreshView(e.target.dataset.target);
-    });
+document.getElementById('sidebar-nav').addEventListener('click', (e) => {
+    const btn = e.target.closest('.nav-btn');
+    if (!btn) return;
+    
+    if (btn.id === 'btn-add-sidebar-box') {
+        openSubjectBoxForm();
+        return;
+    }
+
+    document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+
+    const target = btn.dataset.target;
+    document.querySelectorAll('.view-section').forEach(sec => sec.classList.remove('active'));
+    
+    if (target === 'box') {
+        document.getElementById('view-box').classList.add('active');
+        document.getElementById('page-title').innerText = btn.innerText;
+        renderSubjectBox(btn.dataset.boxId);
+    } else {
+        const viewEl = document.getElementById('view-' + target);
+        if (viewEl) viewEl.classList.add('active');
+        document.getElementById('page-title').innerText = btn.innerText;
+        refreshView(target);
+    }
 });
+
+async function refreshSidebarBoxes() {
+    const boxes = await store.getSubjectBoxes();
+    const container = document.getElementById('dynamic-boxes');
+    
+    const activeBtn = document.querySelector('.nav-btn.active');
+    const activeBoxId = activeBtn?.dataset?.target === 'box' ? activeBtn.dataset.boxId : null;
+
+    container.innerHTML = boxes.map(box => `
+        <button class="nav-btn ${box.id === activeBoxId ? 'active' : ''}" data-target="box" data-box-id="${box.id}">${box.name}</button>
+    `).join('');
+}
 
 async function refreshView(view) {
     if (view === 'dashboard') await renderDashboard();
-    if (view === 'disciplinas') await renderSubjectBoxes();
     if (view === 'clinicas') await renderClinics();
     if (view === 'complementares') await renderActivities('comp');
     if (view === 'extensao') await renderActivities('ext');
@@ -158,76 +182,85 @@ window.openSubjectBoxForm = async (id = null) => {
             name: document.getElementById('box-name').value,
             targetHours: Number(document.getElementById('box-hours').value)
         };
-        if (id) await store.updateSubjectBox(id, data);
-        else await store.addSubjectBox(data);
+        if (id) {
+            await store.updateSubjectBox(id, data);
+            await refreshSidebarBoxes();
+            renderSubjectBox(id);
+            document.getElementById('page-title').innerText = data.name;
+        } else {
+            await store.addSubjectBox(data);
+            await refreshSidebarBoxes();
+        }
         closeModal();
-        renderSubjectBoxes();
     });
 };
-
-document.getElementById('btn-add-subject-box').addEventListener('click', () => openSubjectBoxForm());
 
 window.deleteSubjectBox = async (id) => {
     if(confirm('Tem certeza? Isso apagará TODAS as disciplinas dentro desta caixa também!')) {
         await store.deleteSubjectBox(id);
-        renderSubjectBoxes();
+        await refreshSidebarBoxes();
+        document.querySelector('[data-target="dashboard"]').click();
     }
 };
 
-async function renderSubjectBoxes() {
+async function renderSubjectBox(boxId) {
     const boxes = await store.getSubjectBoxes();
-    const subjects = await store.getSubjects();
-    const container = document.getElementById('subject-boxes-container');
+    const box = boxes.find(b => b.id === boxId);
+    const container = document.getElementById('single-box-container');
     
-    container.innerHTML = boxes.map(box => {
-        const boxSubjects = subjects.filter(s => s.boxId === box.id);
-        const completedHours = boxSubjects.filter(s => s.status === 'concluida').reduce((acc, curr) => acc + Number(curr.hours), 0);
-        const percent = Math.min((completedHours / box.targetHours) * 100, 100) || 0;
+    if (!box) {
+        container.innerHTML = '';
+        return;
+    }
+    
+    const subjects = await store.getSubjects(boxId);
+    const completedHours = subjects.filter(s => s.status === 'concluida').reduce((acc, curr) => acc + Number(curr.hours), 0);
+    const percent = Math.min((completedHours / box.targetHours) * 100, 100) || 0;
 
-        return `
-            <div class="box-item glass-panel">
-                <div class="box-header">
-                    <div>
-                        <h4>${box.name}</h4>
-                        <p style="font-size: 13px; color: var(--text-muted)">${completedHours}h / ${box.targetHours}h</p>
-                    </div>
-                    <div style="display: flex; gap: 5px; flex-wrap: wrap;">
-                        <button class="btn btn-secondary btn-sm" onclick="openSubjectBoxForm('${box.id}')">✏️ Editar</button>
-                        <button class="btn btn-secondary btn-sm" style="color: var(--danger-color); border-color: var(--danger-color);" onclick="deleteSubjectBox('${box.id}')">🗑️ Excluir</button>
-                        <button class="btn btn-primary btn-sm" onclick="openSubjectForm('${box.id}')">+ Disciplina</button>
-                    </div>
+    container.innerHTML = `
+        <div class="box-item glass-panel">
+            <div class="box-header">
+                <div>
+                    <h4>${box.name}</h4>
+                    <p style="font-size: 13px; color: var(--text-muted)">${completedHours}h / ${box.targetHours}h</p>
                 </div>
-                <div class="progress-bar-container"><div class="progress-bar" style="width: ${percent}%"></div></div>
-                <div class="subjects-list">
-                    ${boxSubjects.map(s => `
-                        <div class="subject-item status-${s.status}">
-                            <div class="item-header">
-                                <strong>${s.name}</strong>
-                                <div>
-                                    <span style="font-size: 12px; margin-right: 10px;">${s.hours}h - ${formatStatus(s.status)}</span>
-                                    <button class="btn btn-secondary btn-sm" onclick="openSubjectForm('${box.id}', '${s.id}')">✏️</button>
-                                    <button class="btn btn-secondary btn-sm" style="color: var(--danger-color); border-color: var(--danger-color);" onclick="deleteSubject('${s.id}')">🗑️</button>
-                                </div>
-                            </div>
-                            <div class="item-details">
-                                <span>Semestre Ideal: ${s.idealSemester}</span>
-                                ${s.status === 'concluida' ? `<span>Sem. Conclusão: ${s.completionSemester}</span>` : ''}
-                                ${s.status === 'em_curso' ? `<span>Prof: ${s.professor || 'N/A'}</span> <span>Horário: ${s.dayOfWeek} ${s.time}</span> <span>Sala: ${s.room}</span>` : ''}
-                                ${s.emphasis === 'sim' ? `<span style="color: var(--success-color)">Ênfase: ${s.emphasisCategory}</span>` : ''}
-                                <div style="width: 100%; margin-top: 5px;">${generateLinksHTML(s)}</div>
-                            </div>
-                        </div>
-                    `).join('')}
+                <div style="display: flex; gap: 5px; flex-wrap: wrap;">
+                    <button class="btn btn-secondary btn-sm" onclick="openSubjectBoxForm('${box.id}')">✏️ Editar</button>
+                    <button class="btn btn-secondary btn-sm" style="color: var(--danger-color); border-color: var(--danger-color);" onclick="deleteSubjectBox('${box.id}')">🗑️ Excluir</button>
+                    <button class="btn btn-primary btn-sm" onclick="openSubjectForm('${box.id}')">+ Disciplina</button>
                 </div>
             </div>
-        `;
-    }).join('');
+            <div class="progress-bar-container"><div class="progress-bar" style="width: ${percent}%"></div></div>
+            <div class="subjects-list">
+                ${subjects.map(s => `
+                    <div class="subject-item status-${s.status}">
+                        <div class="item-header">
+                            <strong>${s.name}</strong>
+                            <div>
+                                <span style="font-size: 12px; margin-right: 10px;">${s.hours}h - ${formatStatus(s.status)}</span>
+                                <button class="btn btn-secondary btn-sm" onclick="openSubjectForm('${box.id}', '${s.id}')">✏️</button>
+                                <button class="btn btn-secondary btn-sm" style="color: var(--danger-color); border-color: var(--danger-color);" onclick="deleteSubject('${s.id}')">🗑️</button>
+                            </div>
+                        </div>
+                        <div class="item-details">
+                            <span>Semestre Ideal: ${s.idealSemester}</span>
+                            ${s.status === 'concluida' ? `<span>Sem. Conclusão: ${s.completionSemester}</span>` : ''}
+                            ${s.status === 'em_curso' ? `<span>Prof: ${s.professor || 'N/A'}</span> <span>Horário: ${s.dayOfWeek} ${s.time}</span> <span>Sala: ${s.room}</span>` : ''}
+                            ${s.emphasis === 'sim' ? `<span style="color: var(--success-color)">Ênfase: ${s.emphasisCategory}</span>` : ''}
+                            <div style="width: 100%; margin-top: 5px;">${generateLinksHTML(s)}</div>
+                        </div>
+                    </div>
+                `).join('')}
+            </div>
+        </div>
+    `;
 }
 
 window.deleteSubject = async (id) => {
     if(confirm('Excluir esta disciplina?')) {
         await store.deleteSubject(id);
-        renderSubjectBoxes();
+        const activeBoxId = document.querySelector('.nav-btn.active')?.dataset.boxId;
+        if (activeBoxId) renderSubjectBox(activeBoxId);
     }
 };
 
@@ -334,7 +367,7 @@ window.openSubjectForm = async (boxId, id = null) => {
         if(id) await store.updateSubject(id, data);
         else await store.addSubject(data);
         closeModal();
-        renderSubjectBoxes();
+        renderSubjectBox(boxId);
     });
 };
 
@@ -660,6 +693,7 @@ window.addEventListener('DOMContentLoaded', async () => {
     try {
         if (!window.supabase) throw new Error("Supabase SDK failed to load from CDN.");
         await store.init();
+        await refreshSidebarBoxes();
         renderDashboard();
     } catch (err) {
         document.body.innerHTML = `<div style="padding: 20px; color: white; background: red; height: 100vh;">
